@@ -19,8 +19,6 @@ proximates_df = cofid_dfs[sheets[0]]
 inorganics_df = cofid_dfs[sheets[1]]
 vitamins_df = cofid_dfs[sheets[2]]
 
-# print(proximates_df.columns, "\n")
-
 
 # Cleaning time
 # trace value represented with Tr
