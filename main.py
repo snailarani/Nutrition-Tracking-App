@@ -1,17 +1,15 @@
 """
 https://realpython.com/python-data-cleaning-numpy-pandas/
-1. Drop unnecessary columns
-2. Change index if needed
-3. Tidy fields
-4. Clean Columns
-5. 
+1. Drop unnecessary columns and rows
+2. Clean fields (handle tr)
+3. Change index if needed
+4. Convert columns to right type
 
 Replacing trace values:
 - Will employ these rules for handling trace values:
 -- Macronutrients: Tr -> 0.1g/0.1kcal
--- Vitamins: Tr -> 0.1mg
+-- Vitamins: Tr -> 0.1mg/0.1µg
 -- Minerals: Tr -> 0.01mg
-
 """
 
 import os
@@ -26,11 +24,9 @@ MACROS = ["Energy (kcal) (kcal)", "Energy (kJ) (kJ)", "Protein (g)", "Fat (g)", 
 VITAMINS = ["Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]
 MINERALS = ["Sodium (mg)", "Potassium (mg)", "Calcium (mg)", "Magnesium (mg)", "Iron (mg)", "Copper (mg)", "Zinc (mg)", "Manganese (mg)"]
 
+BASE_COLUMNS = ["Food Code", "Food Name", "Group"]
 
 def load_data():
-    """
-    Load data from cofid dataset into data frame
-    """
     # If excel sheet not cached - cache it, else load into cofid_dfs
     if not os.path.exists(COFID_PICKLE_PATH):
         cofid = pd.read_excel(COFID_EXCEL_PATH, sheet_name=SHEETS)
@@ -39,37 +35,21 @@ def load_data():
     cofid_dfs = pd.read_pickle(COFID_PICKLE_PATH)
     return cofid_dfs
 
-def drop_columns(df, keep_columns):
-    return df[keep_columns]
-
-def drop_rows(df):
-    df = df.replace("N", np.nan)
-    df = df.dropna()
-    return df
-
-def clean_fields(df, clean_columns):
-    for col in df[clean_columns]:
+def clean_dataframe(df, keep_columns, measure_columns):
+    # Drop uneeded columns and rows with 'N' or empty values
+    df = df[keep_columns].replace("N", np.nan).dropna()
+    # Clean fields in the columns with numeric measurements
+    for col in df[measure_columns]:
         if col in MACROS or col in VITAMINS:
             df[col] = df[col].replace("Tr", 0.1)
         elif col in MINERALS:
             df[col] = df[col].replace("Tr", 0.01)
+    # Re-index rows
+    df = df.reset_index(drop=True)
+    # Convert columns with numeric measurements into np/python float types
+    df[measure_columns] = df[measure_columns].apply(pd.to_numeric)
     return df
 
-def index_rows(df):
-    return df.reset_index(drop=True)
-    
-def convert_df_numeric(df, numeric_columns):
-    df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric)
-    return df
-
-def clean_dataframe(df, keep_columns, measure_columns):
-    print(measure_columns)
-    df = drop_columns(df, keep_columns)
-    df = drop_rows(df)
-    df= clean_fields(df, measure_columns)
-    df = index_rows(df)
-    df = convert_df_numeric(df, measure_columns)
-    return df
 
 cofid_dfs = load_data()
 
@@ -78,18 +58,27 @@ proximates_df = cofid_dfs[SHEETS[0]]
 inorganics_df = cofid_dfs[SHEETS[1]]
 vitamins_df = cofid_dfs[SHEETS[2]]
 
-proximates_columns = ["Food Code", "Food Name", "Group", "Water (g)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Energy (kcal) (kcal)", "Energy (kJ) (kJ)", "Total sugars (g)"]
-inorganics_columns = ["Food Code", "Food Name", "Group", "Sodium (mg)", "Potassium (mg)", "Calcium (mg)", "Magnesium (mg)", "Iron (mg)", "Copper (mg)", "Zinc (mg)", "Manganese (mg)"]
-vitamins_columns = ["Food Code", "Food Name", "Group", "Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]
+proximates_columns = BASE_COLUMNS + ["Water (g)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Energy (kcal) (kcal)", "Energy (kJ) (kJ)", "Total sugars (g)"]
+inorganics_columns = BASE_COLUMNS + ["Sodium (mg)", "Potassium (mg)", "Calcium (mg)", "Magnesium (mg)", "Iron (mg)", "Copper (mg)", "Zinc (mg)", "Manganese (mg)"]
+vitamins_columns = BASE_COLUMNS + ["Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]
+
+cofid_dfs_dict = {
+    "proximates": [proximates_df, proximates_columns],
+    "inorganics": [inorganics_df, inorganics_columns],
+    "vitamins": [vitamins_df, vitamins_columns]
+}
 
 clean_cofid_dfs = [proximates_df, inorganics_df, vitamins_df]
 clean_cofid_columns = [proximates_columns, inorganics_columns, vitamins_columns]
 
-for i in range(len(clean_cofid_dfs)):
-    df = clean_cofid_dfs[i]
-    columns = clean_cofid_columns[i]
+
+for name, df_items in cofid_dfs_dict.items():
+    df = df_items[0]
+    columns = df_items[1]
     df = clean_dataframe(df, columns, columns[3:])
-    df.to_excel("test"+str(i)+".xlsx")
+    df.to_excel("food_dataset/"+name+".xlsx")
+
+
 
 
 # ---------------- Just in case I need this again --------------------- #
