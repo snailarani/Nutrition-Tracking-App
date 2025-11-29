@@ -28,7 +28,7 @@ COFID_PICKLE_PATH = "food_dataset/cofid_pickle"
 SHEETS = ["1.3 Proximates", "1.4 Inorganics", "1.5 Vitamins"]
 COFID_OUTPUT_PATH = "food_dataset/cofid_clean.xlsx"
 
-MACROS = ["Energy (kcal) (kcal)", "Energy (kJ) (kJ)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Water (g)", "Total sugars (g)"]
+MACROS = ["Energy (kcal) (kcal)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Water (g)", "Total sugars (g)"]
 VITAMINS = ["Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]
 MINERALS = ["Sodium (mg)", "Potassium (mg)", "Calcium (mg)", "Magnesium (mg)", "Iron (mg)", "Copper (mg)", "Zinc (mg)", "Manganese (mg)"]
 
@@ -66,7 +66,7 @@ proximates_df = cofid_dfs[SHEETS[0]]
 inorganics_df = cofid_dfs[SHEETS[1]]
 vitamins_df = cofid_dfs[SHEETS[2]]
 
-proximates_columns = BASE_COLUMNS + ["Water (g)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Energy (kcal) (kcal)", "Energy (kJ) (kJ)", "Total sugars (g)"]
+proximates_columns = BASE_COLUMNS + ["Water (g)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Energy (kcal) (kcal)", "Total sugars (g)"]
 inorganics_columns = BASE_COLUMNS + ["Sodium (mg)", "Potassium (mg)", "Calcium (mg)", "Magnesium (mg)", "Iron (mg)", "Copper (mg)", "Zinc (mg)", "Manganese (mg)"]
 vitamins_columns = BASE_COLUMNS + ["Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]
 
@@ -78,6 +78,7 @@ cofid_dfs_dict = {
 
 clean_cofid_dfs = [proximates_df, inorganics_df, vitamins_df]
 clean_cofid_columns = [proximates_columns, inorganics_columns, vitamins_columns]
+
 
 
 with pd.ExcelWriter(COFID_OUTPUT_PATH) as writer:
