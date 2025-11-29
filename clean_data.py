@@ -10,7 +10,14 @@ Replacing trace values:
 -- Macronutrients: Tr -> 0.1g/0.1kcal
 -- Vitamins: Tr -> 0.1mg/0.1µg
 -- Minerals: Tr -> 0.01mg
+
+
+TODO:
+- get rid of Energy(Kj) in Proximates
+
 """
+
+
 
 import os
 import pandas as pd
