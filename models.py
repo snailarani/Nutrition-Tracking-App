@@ -1,4 +1,3 @@
-import sqlalchemy as db
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
@@ -8,12 +7,7 @@ from sqlalchemy import String, Float
 from typing import List
 
 
-# Start with sqlite for now (easier for prototypeing) then migrate to postgres later
-engine = db.create_engine("sqlite:///nutrition.db")
-
-
 # Models
-
 class Base(DeclarativeBase):
     pass
 
@@ -26,12 +20,12 @@ class Food(Base):
     group_code: Mapped[str] = mapped_column(String(3))
 
     # To get proximate/inorganic/vitamin data on a particular food
-    proximates: Mapped["Proximates"] = relationship(back_populates="food")
-    inorganics: Mapped["Inorganics"] = relationship(back_populates="food")
-    vitamins: Mapped["Vitamins"] = relationship(back_populates="food")
+    proximates: Mapped["Proximates"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
+    inorganics: Mapped["Inorganics"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
+    vitamins: Mapped["Vitamins"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
 
     # To get the group of a particular food
-    group: Mapped["Group"] = relationship(back_populates="food")
+    group: Mapped["Groups"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
 
 
 # Holds data on macros 
@@ -47,7 +41,8 @@ class Proximates(Base):
     calories: Mapped[float] = mapped_column(Float, nullable=False)
     sugar: Mapped[float] = mapped_column(Float, nullable=False)
 
-    food: Mapped["Food"] = relationship(back_populates="proximates")
+    # Get the food name for a proximate row - do i need this?
+    food: Mapped["Food"] = relationship(back_populates="proximates", uselist=False)
 
 # Holds data on inorganics (e.g sodium, calcium)
 class Inorganics(Base):
@@ -64,7 +59,7 @@ class Inorganics(Base):
     zinc: Mapped[float] = mapped_column(Float, nullable=False)
     manganese: Mapped[float] = mapped_column(Float, nullable=False)
     
-    food: Mapped["Food"] = relationship(back_populates="inorganics")
+    food: Mapped["Food"] = relationship(back_populates="inorganics", uselist=False)
 
 
 # Holds data on vitamins
@@ -78,15 +73,14 @@ class Vitamins(Base):
     vitB12: Mapped[float] = mapped_column(Float, nullable=False)
     vitC: Mapped[float] = mapped_column(Float, nullable=False)
     
-    food: Mapped["Food"] = relationship(back_populates="vitamins")
-    pass
+    food: Mapped["Food"] = relationship(back_populates="vitamins", uselist=False)
 
 
 # Holds group names for each code
 class Groups(Base):
     __tablename__ = "groups"
 
-    id: Mapped[str] = mapped_column(ForeignKey("food.group_code"), primary_key = True)
+    id: Mapped[str] = mapped_column(ForeignKey("food.group_code"), primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
 
     # Get all foods for a particular group
