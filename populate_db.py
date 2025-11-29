@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, delete
 import pandas as pd
 from engine import engine
-from models import Proximates, Inorganics, Vitamins, Food
+from models import Proximates, Inorganics, Vitamins, Food, Groups
 
 
 ## TODO: maybe move loading/cleaning data functions here?
@@ -12,9 +12,10 @@ cofid_path = "food_dataset/cofid_clean.xlsx"
 proximates_df = pd.read_excel(cofid_path, sheet_name="proximates")
 inorganics_df = pd.read_excel(cofid_path, sheet_name="inorganics")
 vitamins_df = pd.read_excel(cofid_path, sheet_name="vitamins")
+groups_df = pd.read_csv("food_dataset/food_groups.txt")
 
 # Making column names python compatible 
-dfs = [proximates_df, inorganics_df, vitamins_df]
+dfs = [proximates_df, inorganics_df, vitamins_df, groups_df]
 for df in dfs:
     df.columns = (
         df.columns.str.replace(r"\s+", "_", regex=True)  #  Replace spaces with _
@@ -139,3 +140,22 @@ with Session(engine) as session:
         for vit in vits:
             f.write(f"{vit.food_id}\t{vit.vitD}\t{vit.vitE}\n")
         f.write(f"Number of foods: {len(vits)}")
+
+
+    # Populating group table
+    group_rows = []
+    for row in groups_df.itertuples():
+        group = Groups(
+            id = row.code,
+            name = row.category
+        )
+        group_rows.append(group)
+
+    session.add_all(group_rows)
+    session.commit()
+
+    groups = session.query(Groups).all()
+    with open("food_dataset/groups.txt", "w") as f:
+        for g in groups:
+            f.write(f"{g.id}\t{g.name}\n")
+        f.write(f"Number of foods: {len(groups)}")
