@@ -15,9 +15,9 @@ class Base(DeclarativeBase):
 class Food(Base):
     __tablename__ = "food"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(String(7), primary_key=True)
     name: Mapped[str] = mapped_column(String(500))
-    group_code: Mapped[str] = mapped_column(String(3))
+    group_id: Mapped[str] = mapped_column(ForeignKey("groups.id"))
 
     # To get proximate/inorganic/vitamin data on a particular food
     proximates: Mapped["Proximates"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
@@ -25,14 +25,14 @@ class Food(Base):
     vitamins: Mapped["Vitamins"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
 
     # To get the group of a particular food
-    group: Mapped["Groups"] = relationship(back_populates="food", cascade="all, delete-orphan", uselist=False)
+    group: Mapped["Groups"] = relationship(back_populates="food", uselist=False)
 
 
 # Holds data on macros 
 class Proximates(Base):
     __tablename__ = "proximates"
 
-    food_id: Mapped[int] = mapped_column(ForeignKey("food.id"), primary_key=True)
+    food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), primary_key=True)
 
     water: Mapped[float] = mapped_column(Float, nullable=False)
     protein: Mapped[float] = mapped_column(Float, nullable=False)
@@ -48,7 +48,7 @@ class Proximates(Base):
 class Inorganics(Base):
     __tablename__ = "inorganics"
 
-    food_id: Mapped[int] = mapped_column(ForeignKey("food.id"), primary_key=True)
+    food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), primary_key=True)
 
     sodium: Mapped[float] = mapped_column(Float, nullable=False)
     potassium: Mapped[float] = mapped_column(Float, nullable=False)
@@ -66,7 +66,7 @@ class Inorganics(Base):
 class Vitamins(Base):
     __tablename__ = "vitamins"
 
-    food_id: Mapped[int] = mapped_column(ForeignKey("food.id"), primary_key=True)
+    food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), primary_key=True)
 
     vitD: Mapped[float] = mapped_column(Float, nullable=False)
     vitE: Mapped[float] = mapped_column(Float, nullable=False)
@@ -80,7 +80,7 @@ class Vitamins(Base):
 class Groups(Base):
     __tablename__ = "groups"
 
-    id: Mapped[str] = mapped_column(ForeignKey("food.group_code"), primary_key=True)
+    id: Mapped[str] = mapped_column(String(3), primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
 
     # Get all foods for a particular group

@@ -26,6 +26,7 @@ import numpy as np
 COFID_EXCEL_PATH = "food_dataset/cofid.xlsx"
 COFID_PICKLE_PATH = "food_dataset/cofid_pickle"
 SHEETS = ["1.3 Proximates", "1.4 Inorganics", "1.5 Vitamins"]
+COFID_OUTPUT_PATH = "food_dataset/cofid_clean.xlsx"
 
 MACROS = ["Energy (kcal) (kcal)", "Energy (kJ) (kJ)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Water (g)", "Total sugars (g)"]
 VITAMINS = ["Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]
@@ -79,12 +80,16 @@ clean_cofid_dfs = [proximates_df, inorganics_df, vitamins_df]
 clean_cofid_columns = [proximates_columns, inorganics_columns, vitamins_columns]
 
 
-for name, df_items in cofid_dfs_dict.items():
-    df = df_items[0]
-    columns = df_items[1]
-    df = clean_dataframe(df, columns, columns[3:])
-    df.to_excel("food_dataset/"+name+".xlsx")
+with pd.ExcelWriter(COFID_OUTPUT_PATH) as writer:
+    for name, df_items in cofid_dfs_dict.items():
+        df = df_items[0]
+        columns = df_items[1]
+        df = clean_dataframe(df, columns, columns[3:])
+        df.to_excel(writer, sheet_name=name, index=False)
 
+
+
+# Converting to dataframes to populate SQLAlchemy tables
 
 
 
