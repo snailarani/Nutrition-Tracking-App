@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, Float
 from typing import List
+from datetime import date, datetime
 
 
 # Models
@@ -86,3 +87,37 @@ class Groups(Base):
     # Get all foods for a particular group
     food: Mapped[List["Food"]] = relationship(back_populates="group")
     
+
+
+
+# ---------- Put this here for now, can move later ---------- #
+class User(Base):
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    # username: Mapped[str] = mapped_column(String(100))
+    # password: Mapped[str] = mapped_column(String(100))
+
+
+# class FoodLogs(Base):
+#     __tablename__ = "foodlog"
+
+#     id: Mapped[int] = mapped_column(primary_key=True)
+
+#     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+#     food_code: Mapped[str] = mapped_column(ForeignKey("food.id"))
+#     # nutrient measurements taken per 100g
+#     quantity: Mapped[float] = mapped_column(Float)
+#     date: Mapped[date] = mapped_column()
+#     date_time: Mapped[datetime]
+
+
+#     pass
+
+
+# Stores pre made meals - for later!
+class UserMeals(Base):
+    pass
+
+
