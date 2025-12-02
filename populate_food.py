@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, delete
+from sqlalchemy import delete
 import pandas as pd
 from engine import engine
 from models import Proximates, Inorganics, Vitamins, Food, Groups
@@ -24,7 +24,7 @@ for df in dfs:
         .str.strip("_")                                 # Remove trailing underscores
     )
 
-print(vitamins_df['food_code'].duplicated().any())
+# print(vitamins_df['food_code'].duplicated().any())
 
 # Getting all foods from all tables:
 food_series = []

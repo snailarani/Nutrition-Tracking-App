@@ -114,7 +114,8 @@ class FoodLogs(Base):
 
 
 # Stores pre made meals - for later!
-class UserMeals(Base):
-    pass
+# class UserMeals(Base):
+#     __tablename__ = "usermeals"
+#     pass
 
 
