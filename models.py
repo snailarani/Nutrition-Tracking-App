@@ -96,6 +96,8 @@ class Users(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    food_logs: Mapped[List["FoodLogs"]] = relationship(back_populates="foodlog")
+
     # username: Mapped[str] = mapped_column(String(100))
     # password: Mapped[str] = mapped_column(String(100))
 
@@ -112,6 +114,8 @@ class FoodLogs(Base):
     date_created: Mapped[date] = mapped_column(Date, nullable=False)
     time_created: Mapped[time] = mapped_column(Time, nullable=False)
 
+    user: Mapped["Users"] = relationship(back_populates="users", uselist=False)
+    food: Mapped["Food"] = relationship(back_populates="food", uselist=False)
 
 # Stores pre made meals - for later!
 # class UserMeals(Base):

@@ -56,5 +56,5 @@ for i, row in food_logs_df.iterrows():
 
 session = Session(engine)
 stmt = select(FoodLogs).where(FoodLogs.user_id.in_([2, 3]))
-for log in session.scalars(stmt):
-    print(log.quantity)
+# for log in session.scalars(stmt):
+    # print(log.quantity)
