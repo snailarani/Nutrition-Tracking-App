@@ -3,9 +3,9 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, Float, Date, DateTime
+from sqlalchemy import String, Float, Date, Time
 from typing import List
-from datetime import date, datetime
+from datetime import date, time
 
 
 # Models
@@ -91,7 +91,7 @@ class Groups(Base):
 
 
 # ---------- Put this here for now, can move later ---------- #
-class User(Base):
+class Users(Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -110,7 +110,7 @@ class FoodLogs(Base):
     # nutrient measurements taken per 100g
     quantity: Mapped[float] = mapped_column(Float, nullable=False)
     date_created: Mapped[date] = mapped_column(Date, nullable=False)
-    date_time_created: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    time_created: Mapped[time] = mapped_column(Time, nullable=False)
 
 
 # Stores pre made meals - for later!
