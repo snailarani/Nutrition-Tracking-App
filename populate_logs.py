@@ -37,7 +37,7 @@ with Session(engine) as session:
         session.execute(delete(FoodLogs))
         session.execute(delete(Users))
 
-for i in range(20):
+for i in range(21):
     add_user()
 
 food_logs_df = pd.read_csv("seed_data/seed_food_logs", header=0)
