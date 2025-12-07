@@ -1,16 +1,18 @@
+
+from app import db
+from app.models import Users, FoodLogs
+
 from sqlalchemy.orm import Session
 from sqlalchemy import delete, select
 import pandas as pd
-from engine import engine
-from models import Users, FoodLogs
+
 
 # Later add login details
 def add_user():
-    with Session(engine) as session:
-        with session.begin():
-            user = Users()
-            session.add(user)
-        return user.id
+    user = Users()
+    db.session.add(user)
+    db.session.commit()
+    return user.id
 
 
 def add_food_log(uid, fcode, quantity, date, time):
@@ -21,21 +23,18 @@ def add_food_log(uid, fcode, quantity, date, time):
         date_created = date,
         time_created = time
     )
-
-    with Session(engine) as session:
-        with session.begin():
-            session.add(log)
-        return log.id
+    db.session.add(log)
+    db.session.commit()
+    return log.id
     
 
 # ---------- Seed data - Temporary ------------#
 import pandas as pd
 from datetime import date, time
 
-with Session(engine) as session:
-    with session.begin():
-        session.execute(delete(FoodLogs))
-        session.execute(delete(Users))
+db.session.execute(delete(FoodLogs))
+db.session.execute(delete(Users))
+db.session.commit()
 
 for i in range(21):
     add_user()
@@ -54,7 +53,8 @@ for i, row in food_logs_df.iterrows():
         time(int(row["hour"]), int(row["minute"]))
     )
 
-session = Session(engine)
+
 stmt = select(FoodLogs).where(FoodLogs.user_id.in_([2, 3]))
+print(db.session.scalars(stmt).all())
 # for log in session.scalars(stmt):
     # print(log.quantity)

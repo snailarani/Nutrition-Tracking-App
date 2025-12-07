@@ -23,10 +23,10 @@ import os
 import pandas as pd
 import numpy as np
 
-COFID_EXCEL_PATH = "food_dataset/cofid.xlsx"
-COFID_PICKLE_PATH = "food_dataset/cofid_pickle"
+COFID_EXCEL_PATH = "data/cofid.xlsx"
+COFID_PICKLE_PATH = "data/cofid_pickle"
 SHEETS = ["1.3 Proximates", "1.4 Inorganics", "1.5 Vitamins"]
-COFID_OUTPUT_PATH = "food_dataset/cofid_clean.xlsx"
+COFID_OUTPUT_PATH = "data/cofid_clean.xlsx"
 
 MACROS = ["Energy (kcal) (kcal)", "Protein (g)", "Fat (g)", "Carbohydrate (g)", "Water (g)", "Total sugars (g)"]
 VITAMINS = ["Vitamin D (µg)", "Vitamin E (mg)", "Vitamin B6 (mg)", "Vitamin B12 (µg)", "Vitamin C (mg)"]

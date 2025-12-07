@@ -1,22 +1,18 @@
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, Float, Integer, Date, Time
+from app import db
+
+from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import ForeignKey, String, Float, Integer, Date, Time
 from typing import List
 from datetime import date, time
+
 
 """
 TODO: Add checks for invalid entries
 """
 
-# Models
-class Base(DeclarativeBase):
-    pass
 
 # Holds basic information on ALL food in the database
-class Food(Base):
+class Food(db.Model):
     __tablename__ = "food"
 
     id: Mapped[str] = mapped_column(String(7), primary_key=True)
@@ -33,7 +29,7 @@ class Food(Base):
 
 
 # Holds data on macros 
-class Proximates(Base):
+class Proximates(db.Model):
     __tablename__ = "proximates"
 
     food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), primary_key=True)
@@ -49,7 +45,7 @@ class Proximates(Base):
     food: Mapped["Food"] = relationship(back_populates="proximates", uselist=False)
 
 # Holds data on inorganics (e.g sodium, calcium)
-class Inorganics(Base):
+class Inorganics(db.Model):
     __tablename__ = "inorganics"
 
     food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), primary_key=True)
@@ -67,7 +63,7 @@ class Inorganics(Base):
 
 
 # Holds data on vitamins
-class Vitamins(Base):
+class Vitamins(db.Model):
     __tablename__ = "vitamins"
 
     food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), primary_key=True)
@@ -81,7 +77,7 @@ class Vitamins(Base):
 
 
 # Holds group names for each code
-class Groups(Base):
+class Groups(db.Model):
     __tablename__ = "groups"
 
     id: Mapped[str] = mapped_column(String(3), primary_key=True)
@@ -93,7 +89,7 @@ class Groups(Base):
 
 # Holds recommended daily intake of nutrients
 # Keep all data in one table for now, maybe normalise later
-class DailyIntake(Base):
+class DailyIntake(db.Model):
     __tablename__ = "dailyintake"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -108,7 +104,7 @@ class DailyIntake(Base):
 
 
 # ---------- Put this here for now, can move later ---------- #
-class Users(Base):
+class Users(db.Model):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -121,7 +117,7 @@ class Users(Base):
     # password: Mapped[str] = mapped_column(String(100))
 
 
-class FoodLogs(Base):
+class FoodLogs(db.Model):
     __tablename__ = "foodlog"
 
     id: Mapped[int] = mapped_column(primary_key=True)

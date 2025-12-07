@@ -1,6 +1,8 @@
-from engine import engine
-from models import Base
+from app import create_app, db
 
-# Create the tables
-Base.metadata.drop_all(engine)
-Base.metadata.create_all(engine)
+app = create_app()
+
+# creates all tables
+with app.app_context():
+    db.create_all()
+    print("All tables created!")
