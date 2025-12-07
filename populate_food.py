@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import delete
 import pandas as pd
 from engine import engine
-from models import Proximates, Inorganics, Vitamins, Food, Groups
+from models import Proximates, Inorganics, Vitamins, Food, Groups, DailyIntake
 
 
 ## TODO: maybe move loading/cleaning data functions here?
@@ -13,9 +13,10 @@ proximates_df = pd.read_excel(cofid_path, sheet_name="proximates")
 inorganics_df = pd.read_excel(cofid_path, sheet_name="inorganics")
 vitamins_df = pd.read_excel(cofid_path, sheet_name="vitamins")
 groups_df = pd.read_csv("food_dataset/food_groups.txt")
+daily_nutrition_df = pd.read_csv("food_dataset/daily_nutrition.txt")
 
 # Making column names python compatible 
-dfs = [proximates_df, inorganics_df, vitamins_df, groups_df]
+dfs = [proximates_df, inorganics_df, vitamins_df, groups_df, daily_nutrition_df]
 for df in dfs:
     df.columns = (
         df.columns.str.replace(r"\s+", "_", regex=True)  #  Replace spaces with _
@@ -24,7 +25,7 @@ for df in dfs:
         .str.strip("_")                                 # Remove trailing underscores
     )
 
-# print(vitamins_df['food_code'].duplicated().any())
+# print(daily_nutrition_df['food_code'].duplicated().any())
 
 # Getting all foods from all tables:
 food_series = []
@@ -36,16 +37,21 @@ all_foods_df = pd.concat([proximates_df[food_columns],
 # Remove duplicate foods
 all_foods_df = all_foods_df.drop_duplicates(subset="food_code")
 
+# print(daily_nutrition_df)
+
 # Populating database
 
 # Populate Food first
 with Session(engine) as session:
 
     # Temporary
+    # So that we don't keep populating the table multiple times
     session.execute(delete(Food))
     session.execute(delete(Inorganics))
     session.execute(delete(Vitamins))
     session.execute(delete(Proximates))
+    session.execute(delete(Groups))
+    session.execute(delete(DailyIntake))
     session.commit()
 
     # Populating food table
@@ -159,3 +165,25 @@ with Session(engine) as session:
         for g in groups:
             f.write(f"{g.id}\t{g.name}\n")
         f.write(f"Number of foods: {len(groups)}")
+
+    
+    # Populating daily nutrition table
+    daily_rows = []
+    for row in daily_nutrition_df.itertuples():
+        daily = DailyIntake(
+            sex = row.sex,
+            age_min = row.age_min,
+            age_max = row.age_max,
+            nutrient = row.nutrient,
+            value = row.value
+        )
+        daily_rows.append(daily)
+    session.add_all(daily_rows)
+    session.commit()
+
+    # daily = session.query(DailyIntake).all()
+    # with open("food_dataset/ahhh.txt", "w") as f:
+    #     for d in daily:
+    #         f.write(f"{d.nutrient}\t{d.value}\t{d.age_min}\t{d.sex}\n")
+    #     f.write(f"Number of reccs: {len(daily)}")
+    

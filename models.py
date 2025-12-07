@@ -3,10 +3,13 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, Float, Date, Time
+from sqlalchemy import String, Float, Integer, Date, Time
 from typing import List
 from datetime import date, time
 
+"""
+TODO: Add checks for invalid entries
+"""
 
 # Models
 class Base(DeclarativeBase):
@@ -88,6 +91,20 @@ class Groups(Base):
     food: Mapped[List["Food"]] = relationship(back_populates="group")
     
 
+# Holds recommended daily intake of nutrients
+# Keep all data in one table for now, maybe normalise later
+class DailyIntake(Base):
+    __tablename__ = "dailyintake"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    sex: Mapped[str] = mapped_column(String(1), nullable=False)
+    age_min: Mapped[int] = mapped_column(Integer, nullable=False)
+    age_max: Mapped[int] = mapped_column(Integer, nullable=False)
+    nutrient: Mapped[str] = mapped_column(String(20), nullable=False)
+    value: Mapped[float] = mapped_column(Float, nullable=False)
+    
+
 
 
 # ---------- Put this here for now, can move later ---------- #
@@ -95,6 +112,10 @@ class Users(Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    # age: Mapped[int] = mapped_column(Integer, nullable=False)
+    # sex: Mapped[str] = mapped_column(String(1), nullable=False)
+
+    food_logs: Mapped[List["FoodLogs"]] = relationship(back_populates="user")
 
     # username: Mapped[str] = mapped_column(String(100))
     # password: Mapped[str] = mapped_column(String(100))
@@ -112,6 +133,9 @@ class FoodLogs(Base):
     date_created: Mapped[date] = mapped_column(Date, nullable=False)
     time_created: Mapped[time] = mapped_column(Time, nullable=False)
 
+    user: Mapped["Users"] = relationship(back_populates="food_logs", uselist=False)
+    # May want to turn this into a bidirectional relationship later
+    food: Mapped["Food"] = relationship("Food", uselist=False)
 
 # Stores pre made meals - for later!
 # class UserMeals(Base):
