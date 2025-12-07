@@ -4,10 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from datetime import date
 
-# TODO: handle none values (e.g when food has no vitamins)
-# Skip if vitamins data is missing
-# if food_vits is None:
-# continue
+
 def calc_nutrition_range(uid, date_start, date_end):
     session = Session(engine)
     # Get all foods from logs with uid in date range
@@ -21,9 +18,9 @@ def calc_nutrition_range(uid, date_start, date_end):
     # List of all food logs
     food_logs = session.scalars(get_food_stmt).all()
 
-    proximates_sums = calculate_nutrient_sums(Proximates, food_logs, "proximates")
-    inorganics_sums = calculate_nutrient_sums(Inorganics, food_logs, "inorganics")
-    vitamins_sums = calculate_nutrient_sums(Vitamins, food_logs, "vitamins")
+    proximates_sums = calculate_nutrient_sums(Proximates, "proximates", food_logs)
+    inorganics_sums = calculate_nutrient_sums(Inorganics, "inorganics", food_logs)
+    vitamins_sums = calculate_nutrient_sums(Vitamins, "vitamins", food_logs)
 
 
     print(proximates_sums)
@@ -33,7 +30,7 @@ def calc_nutrition_range(uid, date_start, date_end):
 
 
 # Calculates nutrient sums for a particular table (proximates, inorganics, vitamins)
-def calculate_nutrient_sums(table, food_logs, table_name):
+def calculate_nutrient_sums(table, table_name, food_logs):
     # Getting all nutrients from the proximates table
     nutrient_cols = [col.key for col in(table.__table__.c[1:])]
     nutrient_sums = {n:0 for n in nutrient_cols}
@@ -42,6 +39,9 @@ def calculate_nutrient_sums(table, food_logs, table_name):
     for log in food_logs:
         food = log.food
         food_nutrients = getattr(food, table_name)
+        # If food has empty value for a particular nutrient, it has no values for this nutrient table
+        if food_nutrients == None:
+            continue
         for n in nutrient_cols:
             nutrient_sums[n] += log.quantity * getattr(food_nutrients, n)
 
