@@ -56,3 +56,4 @@ def calc_daily_nutrition():
 
 def calc_weekly_nutrition():
     pass
+
