@@ -1,5 +1,5 @@
 
-from app import db, create_app
+from app import db
 from app.models import Proximates, Inorganics, Vitamins, Food, Groups, DailyIntake
 
 from sqlalchemy import delete
@@ -10,7 +10,7 @@ TODO: maybe move loading/cleaning data functions here?
 TODO: use batch commits instead - will refactor this entire file later
 """
 
-def populate_food_database():
+def main():
     cofid_path = "data/cofid_clean.xlsx"
 
     proximates_df = pd.read_excel(cofid_path, sheet_name="proximates")
