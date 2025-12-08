@@ -1,7 +1,11 @@
-import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
+
+"""
+TODO: make a new folder for routes
+"""
+
 
 class Base(DeclarativeBase):
     pass
@@ -18,9 +22,10 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False # avoids warnings
 
     db.init_app(app)
-    
 
-
-
+    # a simple page that says hello
+    @app.route("/")
+    def hello():
+            return "<h1>Home Page</h1>"
 
     return app

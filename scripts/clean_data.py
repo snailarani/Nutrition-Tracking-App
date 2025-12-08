@@ -88,7 +88,8 @@ def main():
             df = clean_dataframe(df, columns, columns[3:])
             df.to_excel(writer, sheet_name=name, index=False)
 
-
+if __name__ == "__main__":
+    main()
 
 # Converting to dataframes to populate SQLAlchemy tables
 
