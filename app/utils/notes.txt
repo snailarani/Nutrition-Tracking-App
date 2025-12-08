@@ -1,0 +1,3 @@
+TODO:
+- put the add user and add food log and add meal functions here
+- may need to pass app as a parameter for database functions

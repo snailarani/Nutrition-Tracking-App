@@ -1,12 +1,12 @@
-from engine import engine
-from models import Food, Proximates, Vitamins, Inorganics, Users, FoodLogs
-from sqlalchemy.orm import Session
+
+from app import db
+
+from app.models import Proximates, Vitamins, Inorganics, FoodLogs
 from sqlalchemy import select
 from datetime import date
 
-
 def calc_nutrition_range(uid, date_start, date_end):
-    session = Session(engine)
+    session = db.session
     # Get all foods from logs with uid in date range
     get_food_stmt = (
         select(FoodLogs)
