@@ -1,5 +1,5 @@
 
-from app import db
+from db import db
 
 from app.models import Proximates, Vitamins, Inorganics, FoodLogs
 from sqlalchemy import select

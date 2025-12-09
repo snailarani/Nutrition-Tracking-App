@@ -1,17 +1,12 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
+from .models import Users, FoodLogs
+from .db import db
+
+from flask import Flask, render_template
 
 """
 TODO: make a new folder for routes
 """
-
-
-class Base(DeclarativeBase):
-    pass
-
-# create sqlalchemy instance to be imported everywhere
-db = SQLAlchemy(model_class=Base)
 
 # factory pattern to avoid import issues and make it easier for testing later
 def create_app():
@@ -26,6 +21,22 @@ def create_app():
     # a simple page that says hello
     @app.route("/")
     def hello():
-            return "<h1>Home Page</h1>"
+        return "<h1>Home Page</h1>"
+
+    @app.route("/users")
+    def user_list():
+        get_users_stmt = db.select(Users)
+        users = db.session.execute(get_users_stmt).scalars().all()
+
+        user_ids = [str(user.id) for user in users]
+        return f"User IDs: {', '.join(user_ids)}"
+    
+    @app.route("/food_log")
+    def food_log():
+        user = db.session.execute(db.select(Users).where(Users.id==1)).scalars().one()
+        food_logs = user.food_logs #food_logs is a list of FoodLog objects
+
+        return render_template("food_logs.html", userid=user.id, food_logs=food_logs)
+    
 
     return app

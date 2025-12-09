@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Logs</title>
+
+    <style>
+        table {
+            border: 1px solid black,
+        }
+        td, th {
+            border: 1px solid black,
+        }
+
+    </style>
+
+</head>
+<body>
+    <h1>Food Logs</h1>
+    <h2>Food logs for user {{userid}}</h2>
+
+    <table>
+        <!-- Table headers -->
+        <tr>
+            <th>Food Code</th>
+            <th>Food Name</th>
+            <th>Quantity (g)</th>
+            <th>Date Added</th>
+            <th>Time Added</th>
+        </tr>
+        {% for log in food_logs %}
+        <tr>
+            <td>{{log.food_code}}</td>
+            <td>{{log.food.name}}</td>
+            <td>{{ (log.quantity*100) | round(2) }}</td>
+            <td>{{log.date_created}}</td>
+            <td>{{log.time_created}}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+</html>
