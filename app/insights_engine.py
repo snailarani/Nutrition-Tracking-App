@@ -1,10 +1,10 @@
 
-from db import db
+from .db import db
 
 from app.models import Proximates, Vitamins, Inorganics, FoodLogs
 from sqlalchemy import select
-from datetime import date
 
+# Returns a list of dictionaries of the sums of the nutrients consumed in a particular time period
 def calc_nutrition_range(uid, date_start, date_end):
     session = db.session
     # Get all foods from logs with uid in date range
@@ -22,10 +22,7 @@ def calc_nutrition_range(uid, date_start, date_end):
     inorganics_sums = calculate_nutrient_sums(Inorganics, "inorganics", food_logs)
     vitamins_sums = calculate_nutrient_sums(Vitamins, "vitamins", food_logs)
 
-
-    print(proximates_sums)
-    print(inorganics_sums)
-    print(vitamins_sums)
+    return [proximates_sums, inorganics_sums, vitamins_sums]
 
 
 
@@ -45,11 +42,11 @@ def calculate_nutrient_sums(table, table_name, food_logs):
         for n in nutrient_cols:
             nutrient_sums[n] += log.quantity * getattr(food_nutrients, n)
 
+    # Round all values to 2.d.p
+    nutrient_sums = {nutrient: round(value, 2) for nutrient, value in nutrient_sums.items()}
+
     return nutrient_sums
 
-
-
-calc_nutrition_range(18, date(2025, 1, 1), date(2025, 12, 31))
 
 def calc_daily_nutrition():
     pass
