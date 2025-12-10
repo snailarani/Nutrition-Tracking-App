@@ -17,14 +17,18 @@
 
 </head>
 <body>
-    <h1>Food Insights</h1>
-    <h2>Food Insights for user {{userid}} during time period: {{date_start}} - {{date_end}}</h2>
+    <h1>Nutritional Insights</h1>
+    <li><a href="/">Home</a></li>
+    <h2>Time period: {{date_start}} - {{date_end}}</h2>
+        
+    <br>
 
-    {% set proxs = food_stats[0] %}
-    {% set inorgs = food_stats[1] %}
-    {% set nutrs = food_stats[2] %}
+    <h2>Total nutrients consumed during this period</h2>
 
-    <h3>Proximates (Macros + Calories)</h3>
+    {% set proxs = food_totals[0] %}
+    {% set inorgs = food_totals[1] %}
+    {% set nutrs = food_totals[2] %}
+
     <table>
         <!-- Table headers -->
         <tr>
@@ -34,22 +38,6 @@
             <th>Protein (g)</th>
             <th>Sugars (g)</th>
             <th>Water (g)</th>
-        </tr>
-        <tr>
-            <td>{{proxs["calories"]}}</td>
-            <td>{{proxs["carbohydrate"]}}</td>
-            <td>{{proxs["fat"]}}</td>
-            <td>{{proxs["protein"]}}</td>
-            <td>{{proxs["sugar"]}}</td>
-            <td>{{proxs["water"]}}</td>
-        </tr>
-
-    </table>
-
-    <h3>Inorganics</h3>
-    <table>
-        <!-- Table headers -->
-        <tr>
             <th>Sodium (mg)</th>
             <th>Potassium (mg)</th>
             <th>Calcium (mg)</th>
@@ -60,6 +48,12 @@
             <th>Manganese (mg)</th>
         </tr>
         <tr>
+            <td>{{proxs["calories"]}}</td>
+            <td>{{proxs["carbohydrate"]}}</td>
+            <td>{{proxs["fat"]}}</td>
+            <td>{{proxs["protein"]}}</td>
+            <td>{{proxs["sugar"]}}</td>
+            <td>{{proxs["water"]}}</td>
             <td>{{inorgs["sodium"]}}</td>
             <td>{{inorgs["potassium"]}}</td>
             <td>{{inorgs["calcium"]}}</td>
@@ -69,27 +63,80 @@
             <td>{{inorgs["zinc"]}}</td>
             <td>{{inorgs["manganese"]}}</td>
         </tr>
+
     </table>
 
-    <!-- <h3>Vitamins</h3>
+    <br>
+
+    <h2>Average nutrient consumption per day</h2>
+    <table>
+        <!-- Table headers -->
+        <tr>
+            <th>Calories (kcal)</th>
+            <th>Carbohydrates (g)</th>
+            <th>Fat (g)</th>
+            <th>Protein (g)</th>
+            <th>Sugars (g)</th>
+            <th>Water (g)</th>
+            <th>Sodium (mg)</th>
+            <th>Potassium (mg)</th>
+            <th>Calcium (mg)</th>
+            <th>Magnesium (mg)</th>
+            <th>Iron (mg)</th>
+            <th>Copper (mg)</th>
+            <th>Zinc (mg)</th>
+            <th>Manganese (mg)</th>
+        </tr>
+        <tr>
+            <td>{{food_avg["calories"]}}</td>
+            <td>{{food_avg["carbohydrate"]}}</td>
+            <td>{{food_avg["fat"]}}</td>
+            <td>{{food_avg["protein"]}}</td>
+            <td>{{food_avg["sugar"]}}</td>
+            <td>{{food_avg["water"]}}</td>
+            <td>{{food_avg["sodium"]}}</td>
+            <td>{{food_avg["potassium"]}}</td>
+            <td>{{food_avg["calcium"]}}</td>
+            <td>{{food_avg["magnesium"]}}</td>
+            <td>{{food_avg["iron"]}}</td>
+            <td>{{food_avg["copper"]}}</td>
+            <td>{{food_avg["zinc"]}}</td>
+            <td>{{food_avg["manganese"]}}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <h2>Daily nutrient consumption</h2>
     <table>
         <tr>
-            <th>Vitamin D</th>
-            <th>Vitamin E</th>
-            <th>Vitamin B</th>
-            <th>Vitamin C</th>
+            <th>Date</th>
+            <th>Water (g)</th>
+            <th>Protein (g)</th>
+            <th>Fat (g)</th>
+            <th>Carbohydrates (g)</th>
+            <th>Calories (kcal)</th>
+            <th>Sugars (g)</th>
+            <th>Sodium (mg)</th>
+            <th>Potassium (mg)</th>
+            <th>Calcium (mg)</th>
+            <th>Magnesium (mg)</th>
+            <th>Iron (mg)</th>
+            <th>Copper (mg)</th>
+            <th>Zinc (mg)</th>
+            <th>Manganese (mg)</th>
         </tr>
+
+        {% for date, values in food_daily.items() %}
         <tr>
-            <td>{{inorgs["sodium"]}}</td>
-            <td>{{inorgs["potassium"]}}</td>
-            <td>{{inorgs["calcium"]}}</td>
-            <td>{{inorgs["magnesium"]}}</td>
-            <td>{{inorgs["iron"]}}</td>
-            <td>{{inorgs["copper"]}}</td>
-            <td>{{inorgs["zinc"]}}</td>
-            <td>{{inorgs["manganese"]}}</td>
+            <td>{{date}}</td>
+            {% for value in values.values() %}
+                <td>{{value}}</td>
+            {% endfor %}
         </tr>
-    </table> -->
+        {% endfor %}
+    </table>
 
 </body>
 </html>

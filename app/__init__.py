@@ -20,11 +20,14 @@ def create_app():
 
     db.init_app(app)
 
-    # a simple page that says hello
-    @app.route("/")
-    def hello():
-        avg = calc_average_nutrients(1, date(2025, 1, 1), date(2025, 12, 31))
+    @app.route("/test")
+    def test():
+        avg = calc_daily_nutrition(1, date(2025, 1, 1), date(2025, 12, 31))
         return f"<h1>{avg}</h1>"
+
+    @app.route("/")
+    def home():
+        return render_template("home.html")
 
     @app.route("/users")
     def user_list():
@@ -36,25 +39,34 @@ def create_app():
     
     @app.route("/food_logs")
     def food_log():
-        user = db.session.execute(db.select(Users).where(Users.id==1)).scalars().one()
+        user = db.session.scalars(db.select(Users).where(Users.id==1)).one()
         food_logs = user.food_logs #food_logs is a list of FoodLog objects
 
         return render_template("food_logs.html", userid=user.id, food_logs=food_logs)
     
     @app.route("/food_stats")
     def food_stats():
-        user = db.session.execute(db.select(Users).where(Users.id==1)).scalars().one()
+        user = db.session.scalars(db.select(Users).where(Users.id==1)).one()
         date_start = date(2025, 1, 1)
         date_end = date(2025, 12, 31)
-        food_stats = calc_nutrition_range(1, date_start, date_end)
+        food_totals = calc_nutrition_range(1, date_start, date_end)
+        food_avg = calc_average_nutrients(1, date_start, date_end)
+        food_daily = calc_daily_nutrition(1, date_start, date_end)
 
-        # return f"Food stats: {food_stats[2]}"
+        # return f"Food stats: {food_avg}"
         return render_template("food_stats.html", 
                                userid=user.id, 
-                               food_stats=food_stats,
+                               food_totals=food_totals,
+                               food_avg=food_avg,
+                               food_daily=food_daily,
                                date_start=date_start,
                                date_end=date_end
                                )
     
+
+
+
+
+
 
     return app
