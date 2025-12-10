@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
+from .insights_engine import calc_average_nutrients
+from datetime import date
 
 """
 TODO: make a new folder for routes
@@ -26,6 +28,7 @@ def create_app():
     # a simple page that says hello
     @app.route("/")
     def hello():
-            return "<h1>Home Page</h1>"
+        avg = calc_average_nutrients(1, date(2025, 1, 1), date(2025, 12, 31))
+        return f"<h1>{avg}</h1>"
 
     return app
