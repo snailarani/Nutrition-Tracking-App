@@ -13,18 +13,34 @@ def calc_weekly_nutrition():
     pass
 
 
+# This works, just need to make it look nicer
 def calc_average_nutrients(uid, date_start, date_end):
     session = db.session
 
-    stmt = select(
-        func.avg(FoodLogs.quantity*Proximates.calories),
-        func.avg(FoodLogs.quantity*Proximates.carbohydrate),
-        func.avg(FoodLogs.quantity*Proximates.protein),
-        func.avg(FoodLogs.quantity*Proximates.water),
-        func.avg(FoodLogs.quantity*Proximates.fat),
-        func.avg(FoodLogs.quantity*Proximates.sugar),
+    proximates = [col.key for col in(Proximates.__table__.c[1:])]
+    inorganics = [col.key for col in(Inorganics.__table__.c[1:])]
+    vitamins = [col.key for col in(Vitamins.__table__.c[1:])]
+
+    tables = [Proximates, Inorganics, Vitamins]
+    columns = [proximates, inorganics, vitamins]
+
+    nutrient_avg = []
+    for i in range(3):
+        # Getting all the averages from the columns from each table
+        for col in columns[i]:
+            nutrient_avg.append(func.avg(FoodLogs.quantity * getattr(tables[i], col)))
+
+    stmt = select(*nutrient_avg
+        # func.avg(FoodLogs.quantity*Proximates.calories),
+        # func.avg(FoodLogs.quantity*Proximates.carbohydrate),
+        # func.avg(FoodLogs.quantity*Proximates.protein),
+        # func.avg(FoodLogs.quantity*Proximates.water),
+        # func.avg(FoodLogs.quantity*Proximates.fat),
+        # func.avg(FoodLogs.quantity*Proximates.sugar),
     ).select_from(FoodLogs)\
         .join(Proximates, FoodLogs.food_code == Proximates.food_id)\
+        .join(Inorganics, FoodLogs.food_code == Inorganics.food_id)\
+        .join(Vitamins, FoodLogs.food_code == Vitamins.food_id)\
         .where(FoodLogs.user_id == uid)\
         .where(FoodLogs.date_created >= date_start)\
         .where(FoodLogs.date_created <= date_end)
@@ -47,63 +63,7 @@ def get_logs_in_date_range(uid, date_start, date_end):
     )
 
     # List of all food logs
-    food_logs = session.query(get_food_stmt)
-
-    proximates_sums = calculate_nutrient_sums(Proximates, "proximates", food_logs)
-    inorganics_sums = calculate_nutrient_sums(Inorganics, "inorganics", food_logs)
-    vitamins_sums = calculate_nutrient_sums(Vitamins, "vitamins", food_logs)
-
-
-    print(proximates_sums)
-    print(inorganics_sums)
-    print(vitamins_sums)
-
-
-
-def calc_daily_nutrition():
-    pass
-
-def calc_weekly_nutrition():
-    pass
-
-
-def calc_average_nutrients(uid, date_start, date_end):
-    session = db.session
-
-    stmt = select(
-        func.avg(FoodLogs.quantity*Proximates.calories),
-        func.avg(FoodLogs.quantity*Proximates.carbohydrate),
-        func.avg(FoodLogs.quantity*Proximates.protein),
-        func.avg(FoodLogs.quantity*Proximates.water),
-        func.avg(FoodLogs.quantity*Proximates.fat),
-        func.avg(FoodLogs.quantity*Proximates.sugar),
-    ).select_from(FoodLogs)\
-        .join(Proximates.food_id)\
-        .join(Inorganics.food_id)\
-        .join(Vitamins.food_id)\
-        .where(FoodLogs.user_id == uid)\
-        .where(FoodLogs.date_created >= date_start)\
-        .where(FoodLogs.date_created <= date_end)
-
-    averages = session.execute(stmt).all()
-
-    return averages
-
-
-
-# Gets all the food logs for a particular user within a particular date range
-def get_logs_in_date_range(uid, date_start, date_end):
-    session = db.session
-    # Get all foods from logs with uid in date range
-    get_food_stmt = (
-        select(FoodLogs)
-        .where(FoodLogs.user_id == uid)
-        .where(FoodLogs.date_created >= date_start)
-        .where(FoodLogs.date_created <= date_end)
-    )
-
-    # List of all food logs
-    food_logs = session.query(get_food_stmt)
+    food_logs = session.scalars(get_food_stmt).all()
 
     return food_logs
 
@@ -125,16 +85,31 @@ def calc_nutrient_sums(table, table_name, food_logs):
             continue
         for n in nutrient_cols:
             nutrient_sums[n] += log.quantity * getattr(food_nutrients, n)
+        
+    nutrient_sums = {nutr: round(val,2) for nutr, val in nutrient_sums.items()}
 
     return nutrient_sums
 
 
+def calc_nutrition_range(uid, date_start, date_end):
+    session = db.session
+    # Get all foods from logs with uid in date range
+    get_food_stmt = (
+        select(FoodLogs)
+        .where(FoodLogs.user_id == uid)
+        .where(FoodLogs.date_created >= date_start)
+        .where(FoodLogs.date_created <= date_end)
+    )
 
-calc_nutrition_range(18, date(2025, 1, 1), date(2025, 12, 31))
+    # List of all food logs
+    food_logs = session.scalars(get_food_stmt).all()
 
-def calc_daily_nutrition():
-    pass
+    proximates_sums = calc_nutrient_sums(Proximates, "proximates", food_logs)
+    inorganics_sums = calc_nutrient_sums(Inorganics, "inorganics", food_logs)
+    vitamins_sums = calc_nutrient_sums(Vitamins, "vitamins", food_logs)
 
-def calc_weekly_nutrition():
-    pass
 
+    return [proximates_sums, inorganics_sums, vitamins_sums]
+    
+    
+    
