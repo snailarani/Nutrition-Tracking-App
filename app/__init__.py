@@ -23,7 +23,8 @@ def create_app():
     # a simple page that says hello
     @app.route("/")
     def hello():
-        return "<h1>Home Page</h1>"
+        avg = calc_average_nutrients(1, date(2025, 1, 1), date(2025, 12, 31))
+        return f"<h1>{avg}</h1>"
 
     @app.route("/users")
     def user_list():
