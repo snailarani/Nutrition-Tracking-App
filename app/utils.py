@@ -1,5 +1,5 @@
-from db import db
-from models import Users, FoodLogs
+from .db import db
+from .models import Users, FoodLogs
 
 def add_user():
     user = Users()

@@ -17,7 +17,8 @@
 
 </head>
 <body>
-    <h1>Food Insights</h1>
+    <h1>Nutritional Insights</h1>
+    <li><a href="/">Home</a></li>
     <h2>Time period: {{date_start}} - {{date_end}}</h2>
         
     <br>
@@ -105,8 +106,37 @@
 
     </table>
 
+    <br>
 
+    <h2>Daily nutrient consumption</h2>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Water (g)</th>
+            <th>Protein (g)</th>
+            <th>Fat (g)</th>
+            <th>Carbohydrates (g)</th>
+            <th>Calories (kcal)</th>
+            <th>Sugars (g)</th>
+            <th>Sodium (mg)</th>
+            <th>Potassium (mg)</th>
+            <th>Calcium (mg)</th>
+            <th>Magnesium (mg)</th>
+            <th>Iron (mg)</th>
+            <th>Copper (mg)</th>
+            <th>Zinc (mg)</th>
+            <th>Manganese (mg)</th>
+        </tr>
 
+        {% for date, values in food_daily.items() %}
+        <tr>
+            <td>{{date}}</td>
+            {% for value in values.values() %}
+                <td>{{value}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
 
 </body>
 </html>
