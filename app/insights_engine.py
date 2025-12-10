@@ -25,6 +25,13 @@ def calc_nutrition_range(uid, date_start, date_end):
     return [proximates_sums, inorganics_sums, vitamins_sums]
 
 
+def calc_daily_nutrition():
+    pass
+
+def calc_weekly_nutrition():
+    pass
+
+
 
 # Calculates nutrient sums for a particular table (proximates, inorganics, vitamins)
 def calculate_nutrient_sums(table, table_name, food_logs):
@@ -46,11 +53,3 @@ def calculate_nutrient_sums(table, table_name, food_logs):
     nutrient_sums = {nutrient: round(value, 2) for nutrient, value in nutrient_sums.items()}
 
     return nutrient_sums
-
-
-def calc_daily_nutrition():
-    pass
-
-def calc_weekly_nutrition():
-    pass
-
