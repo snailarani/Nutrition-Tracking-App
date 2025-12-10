@@ -6,8 +6,60 @@ from sqlalchemy import select
 from sqlalchemy.sql import func
 
 
-def calc_daily_nutrition():
-    pass
+def calc_daily_nutrition(uid, date_start, date_end):
+    session = db.session
+
+    # do the same as calc_average nutrients, but aggregate on day
+    # then return dictionary of dictionaries? {day1:{calories:x, water:x, ..}, ...}
+
+    proximates = [col.key for col in(Proximates.__table__.c[1:])]
+    inorganics = [col.key for col in(Inorganics.__table__.c[1:])]
+    vitamins = [col.key for col in(Vitamins.__table__.c[1:])]
+
+    tables = [Proximates, Inorganics, Vitamins]
+    columns = [proximates, inorganics, vitamins]
+
+    nutrient_sum = []
+    for i in range(3):
+        # Getting all the averages from the columns from each table
+        for col in columns[i]:
+            date = FoodLogs.date_created
+            nutrient_sum.append(
+                func.round(
+                    func.sum(
+                        # Coalesce to fill the empty nutrient values with 0
+                        FoodLogs.quantity * func.coalesce(getattr(tables[i], col), 0)
+                    ), 2
+                ).label(col)
+            )
+
+    # Is outer bc not all tables will contain all food items
+    stmt = select(
+        FoodLogs.date_created.label("date"),
+        *nutrient_sum
+    ).select_from(FoodLogs)\
+    .join(Food, FoodLogs.food_code == Food.id)\
+    .join(Proximates, FoodLogs.food_code == Proximates.food_id, isouter=True)\
+    .join(Inorganics, FoodLogs.food_code == Inorganics.food_id, isouter=True)\
+    .join(Vitamins, FoodLogs.food_code == Vitamins.food_id, isouter=True)\
+    .where(FoodLogs.user_id == uid)\
+    .where(FoodLogs.date_created >= date_start)\
+    .where(FoodLogs.date_created <= date_end)\
+    .group_by(FoodLogs.date_created)
+        
+
+    daily_sums = session.execute(stmt).all()
+
+    daily_sums_dict = {}
+    for day in daily_sums:
+        nutrients_dict = dict(day._mapping)
+        date = str(nutrients_dict["date"])
+        nutrients_dict.pop("date")
+        daily_sums_dict[date] = nutrients_dict
+        
+    return daily_sums_dict
+
+
 
 def calc_weekly_nutrition():
     pass
@@ -28,8 +80,17 @@ def calc_average_nutrients(uid, date_start, date_end):
     for i in range(3):
         # Getting all the averages from the columns from each table
         for col in columns[i]:
-            nutrient_avg.append(func.avg(FoodLogs.quantity * getattr(tables[i], col)))
+            nutrient_avg.append(
+                # Coalesce to fill the empty nutrient values with 0
+                func.coalesce(
+                    func.round(
+                        func.avg(FoodLogs.quantity * getattr(tables[i], col)), 2
+                    ), 0
+                )
+                .label(col)
+            )
 
+    # Is outer bc not all tables will contain all food items
     stmt = select(*nutrient_avg
         # func.avg(FoodLogs.quantity*Proximates.calories),
         # func.avg(FoodLogs.quantity*Proximates.carbohydrate),
@@ -38,16 +99,16 @@ def calc_average_nutrients(uid, date_start, date_end):
         # func.avg(FoodLogs.quantity*Proximates.fat),
         # func.avg(FoodLogs.quantity*Proximates.sugar),
     ).select_from(FoodLogs)\
-        .join(Proximates, FoodLogs.food_code == Proximates.food_id)\
-        .join(Inorganics, FoodLogs.food_code == Inorganics.food_id)\
-        .join(Vitamins, FoodLogs.food_code == Vitamins.food_id)\
-        .where(FoodLogs.user_id == uid)\
-        .where(FoodLogs.date_created >= date_start)\
-        .where(FoodLogs.date_created <= date_end)
+    .join(Proximates, FoodLogs.food_code == Proximates.food_id, isouter=True)\
+    .join(Inorganics, FoodLogs.food_code == Inorganics.food_id, isouter=True)\
+    .join(Vitamins, FoodLogs.food_code == Vitamins.food_id, isouter=True)\
+    .where(FoodLogs.user_id == uid)\
+    .where(FoodLogs.date_created >= date_start)\
+    .where(FoodLogs.date_created <= date_end)
 
     averages = session.execute(stmt).all()
 
-    return averages
+    return averages[0]._mapping
 
 
 
