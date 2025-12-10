@@ -1,4 +1,4 @@
-from app import db
+from .db import db
 
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy import ForeignKey, String, Float, Integer, Date, Time
@@ -9,7 +9,6 @@ from datetime import date, time
 """
 TODO: Add checks for invalid entries
 """
-
 
 # Holds basic information on ALL food in the database
 class Food(db.Model):
@@ -133,6 +132,11 @@ class FoodLogs(db.Model):
     # May want to turn this into a bidirectional relationship later
     food: Mapped["Food"] = relationship("Food", uselist=False)
 
+    def __repr__(self):
+        # [Food Code: xx-xxx, Food Name: xxx, Quantity: Xg, at Date]
+        log_str = f"[Food Code: {self.food_code}, Food Name: {self.food.name}, Quantity: {round(self.quantity*100,2)}g, at {self.date_created}, {self.time_created}]"
+        return log_str
+    
 # Stores pre made meals - for later!
 # class UserMeals(Base):
 #     __tablename__ = "usermeals"

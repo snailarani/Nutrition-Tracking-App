@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Logs</title>
+
+    <style>
+        table {
+            border: 1px solid black,
+        }
+        td, th {
+            border: 1px solid black,
+        }
+
+    </style>
+
+</head>
+<body>
+    <h1>Food Insights</h1>
+    <h2>Food Insights for user {{userid}} during time period: {{date_start}} - {{date_end}}</h2>
+
+    {% set proxs = food_stats[0] %}
+    {% set inorgs = food_stats[1] %}
+    {% set nutrs = food_stats[2] %}
+
+    <h3>Proximates (Macros + Calories)</h3>
+    <table>
+        <!-- Table headers -->
+        <tr>
+            <th>Calories (kcal)</th>
+            <th>Carbohydrates (g)</th>
+            <th>Fat (g)</th>
+            <th>Protein (g)</th>
+            <th>Sugars (g)</th>
+            <th>Water (g)</th>
+        </tr>
+        <tr>
+            <td>{{proxs["calories"]}}</td>
+            <td>{{proxs["carbohydrate"]}}</td>
+            <td>{{proxs["fat"]}}</td>
+            <td>{{proxs["protein"]}}</td>
+            <td>{{proxs["sugar"]}}</td>
+            <td>{{proxs["water"]}}</td>
+        </tr>
+
+    </table>
+
+    <h3>Inorganics</h3>
+    <table>
+        <!-- Table headers -->
+        <tr>
+            <th>Sodium (mg)</th>
+            <th>Potassium (mg)</th>
+            <th>Calcium (mg)</th>
+            <th>Magnesium (mg)</th>
+            <th>Iron (mg)</th>
+            <th>Copper (mg)</th>
+            <th>Zinc (mg)</th>
+            <th>Manganese (mg)</th>
+        </tr>
+        <tr>
+            <td>{{inorgs["sodium"]}}</td>
+            <td>{{inorgs["potassium"]}}</td>
+            <td>{{inorgs["calcium"]}}</td>
+            <td>{{inorgs["magnesium"]}}</td>
+            <td>{{inorgs["iron"]}}</td>
+            <td>{{inorgs["copper"]}}</td>
+            <td>{{inorgs["zinc"]}}</td>
+            <td>{{inorgs["manganese"]}}</td>
+        </tr>
+    </table>
+
+    <!-- <h3>Vitamins</h3>
+    <table>
+        <tr>
+            <th>Vitamin D</th>
+            <th>Vitamin E</th>
+            <th>Vitamin B</th>
+            <th>Vitamin C</th>
+        </tr>
+        <tr>
+            <td>{{inorgs["sodium"]}}</td>
+            <td>{{inorgs["potassium"]}}</td>
+            <td>{{inorgs["calcium"]}}</td>
+            <td>{{inorgs["magnesium"]}}</td>
+            <td>{{inorgs["iron"]}}</td>
+            <td>{{inorgs["copper"]}}</td>
+            <td>{{inorgs["zinc"]}}</td>
+            <td>{{inorgs["manganese"]}}</td>
+        </tr>
+    </table> -->
+
+</body>
+</html>
