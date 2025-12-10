@@ -7,25 +7,27 @@ import pandas as pd
 
 from datetime import date, time
 
+from app import utils
+
 # Later add login details
-def add_user():
-    user = Users()
-    db.session.add(user)
-    db.session.commit()
-    return user.id
+# def add_user():
+#     user = Users()
+#     db.session.add(user)
+#     db.session.commit()
+#     return user.id
 
 
-def add_food_log(uid, fcode, quantity, date, time):
-    log = FoodLogs(
-        user_id = uid,
-        food_code = fcode,
-        quantity = quantity,
-        date_created = date,
-        time_created = time
-    )
-    db.session.add(log)
-    db.session.commit()
-    return log.id
+# def add_food_log(uid, fcode, quantity, date, time):
+#     log = FoodLogs(
+#         user_id = uid,
+#         food_code = fcode,
+#         quantity = quantity,
+#         date_created = date,
+#         time_created = time
+#     )
+#     db.session.add(log)
+#     db.session.commit()
+#     return log.id
     
 
 def main():
@@ -39,7 +41,7 @@ def main():
         db.session.commit()
 
         for i in range(21):
-            add_user()
+            utils.add_user()
 
         food_logs_df = pd.read_csv("data/seed_data/seed_food_logs", header=0)
 
@@ -47,7 +49,7 @@ def main():
 
         # Populating food logs table with seed data
         for i, row in food_logs_df.iterrows():
-            add_food_log(
+            utils.add_food_log(
                 int(row["user_id"]),
                 str(row["food_code"]),
                 float(row["quantity"]),
